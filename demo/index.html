@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:image" content="https://tauekel-code.github.io/viandesk/og.jpg">
+<meta property="og:title" content="Vian Desk — демо продукта">
+<meta name="description" content="Vian Desk — AI-консультант отвечает клиентам в WhatsApp, Telegram и Instagram, менеджер подключается, когда нужен человек.">
+<style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Vian Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  :root {
+    --bg: #f7f6fb;
+    --surface: #ffffff;
+    --ink: #1c1830;
+    --muted: #625e76;
+    --line: #e4e0ee;
+    --vian: #7c3aed;
+    --vian-soft: #efe8fd;
+    --indigo: #4f46e5;
+    --ok: #15803d;
+    --warn: #b45309;
+    --shadow: 0 1px 2px rgb(28 24 48 / .06), 0 12px 32px -12px rgb(28 24 48 / .18);
+    --display: "Unbounded", "Golos Text", system-ui, sans-serif;
+    --body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #12101a; --surface: #1b1826; --ink: #ece9f5; --muted: #a7a2ba; --line: #2d2940;
+      --vian: #a78bfa; --vian-soft: #2a2140; --indigo: #8b85f5; --ok: #4ade80; --warn: #fbbf24;
+      --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 12px 32px -12px rgb(0 0 0 / .6);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #12101a; --surface: #1b1826; --ink: #ece9f5; --muted: #a7a2ba; --line: #2d2940;
+    --vian: #a78bfa; --vian-soft: #2a2140; --indigo: #8b85f5; --ok: #4ade80; --warn: #fbbf24;
+    --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 12px 32px -12px rgb(0 0 0 / .6);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.6 var(--body);
+    padding-inline: 20px;
+    padding-block: 0 64px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  header.top { padding-block: 56px 36px; display: grid; gap: 18px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 40px; height: 40px; border-radius: 11px; background: var(--vian); color: #fff;
+    display: grid; place-items: center; font: 700 20px var(--display);
+  }
+  .brand span { font: 500 13px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  h1 { font: 700 clamp(30px, 5vw, 48px)/1.1 var(--display); margin: 0; text-wrap: balance; letter-spacing: -.01em; max-width: 20ch; }
+  h1 em { font-style: normal; color: var(--vian); }
+  .lead { margin: 0; max-width: 62ch; color: var(--muted); font-size: 18px; }
+  .note {
+    font: 500 12px var(--mono); color: var(--muted); letter-spacing: .02em;
+    border: 1px dashed var(--line); border-radius: 8px; padding: 8px 12px; justify-self: start;
+  }
+
+  /* Путь клиента — реальная последовательность, поэтому нумерация */
+  .flow { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 8px; counter-reset: step; }
+  .flow li {
+    counter-increment: step; display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 6px; font-size: 14px;
+  }
+  .flow li::before {
+    content: counter(step); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--vian-soft); color: var(--vian); font: 600 12px var(--mono);
+  }
+
+  nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); margin-inline: -20px; padding: 10px 20px; }
+  nav.toc .wrap { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  nav.toc a {
+    flex: none; text-decoration: none; color: var(--muted); font-size: 14px; padding: 5px 12px; border-radius: 999px;
+  }
+  nav.toc a:hover, nav.toc a:focus-visible { background: var(--vian-soft); color: var(--vian); outline: none; }
+
+  section.screen {
+    display: grid; grid-template-columns: minmax(0, 330px) minmax(0, 1fr); gap: 36px; align-items: start;
+    padding-block: 48px; border-bottom: 1px solid var(--line); scroll-margin-top: 64px;
+  }
+  .text { display: grid; gap: 12px; position: sticky; top: 80px; }
+  .eyebrow { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--vian); }
+  h2 { font: 600 24px/1.25 var(--body); margin: 0; text-wrap: balance; }
+  .text p { margin: 0; color: var(--muted); }
+  .text ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+  .text li::marker { color: var(--vian); }
+  .chip { display: inline-block; font: 500 12px var(--mono); padding: 2px 8px; border-radius: 6px; background: var(--vian-soft); color: var(--vian); }
+
+  figure { margin: 0; }
+  .frame {
+    display: block; text-decoration: none; border-radius: 12px; overflow: hidden; background: var(--surface);
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+  }
+  .bar { display: flex; align-items: center; gap: 6px; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  .bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+  .bar b { margin-left: 10px; font: 500 12px var(--mono); color: var(--muted); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .frame img { display: block; width: 100%; height: auto; }
+  a.frame:focus-visible { outline: 3px solid var(--vian); outline-offset: 3px; }
+  figcaption { margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+  .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
+    background: var(--vian); color: #fff; font: 600 16px var(--body); padding: 12px 20px; border-radius: 12px;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .btn svg { width: 20px; height: 20px; flex: none; }
+  .cta-note { color: var(--muted); font-size: 15px; }
+  .cta-note b { color: var(--ink); font-weight: 600; }
+
+  section.rules { padding-block: 56px; border-bottom: 1px solid var(--line); display: grid; gap: 24px; scroll-margin-top: 64px; }
+  section.rules > header { display: grid; gap: 10px; max-width: 70ch; }
+  .rules-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .rule { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 10px; align-content: start; }
+  .rule .date { font: 500 12px var(--mono); letter-spacing: .04em; color: var(--muted); }
+  .rule h3 { margin: 0; font: 600 18px/1.3 var(--body); text-wrap: balance; }
+  .rule p { margin: 0; color: var(--muted); font-size: 15px; }
+  .rule .verdict { font-size: 15px; color: var(--ink); border-top: 1px solid var(--line); padding-top: 10px; }
+  .rule .verdict b { color: var(--ok); }
+  .rules small { color: var(--muted); font-size: 13px; }
+  .rules small a { color: var(--muted); }
+
+  section.final {
+    margin-top: 48px; background: var(--vian-soft); border-radius: 20px; padding: 36px clamp(20px, 4vw, 44px);
+    display: grid; gap: 14px; justify-items: start;
+  }
+  section.final h2 { font: 700 clamp(24px, 3.4vw, 34px)/1.15 var(--display); letter-spacing: -.01em; }
+  section.final p { margin: 0; max-width: 60ch; color: var(--ink); }
+  .handle { font: 500 14px var(--mono); color: var(--muted); user-select: all; }
+
+  @media (max-width: 860px) { .rules-grid { grid-template-columns: 1fr; } }
+
+  footer { padding-block: 40px 0; display: grid; gap: 10px; color: var(--muted); font-size: 14px; max-width: 70ch; }
+  footer strong { color: var(--ink); }
+
+  @media (max-width: 860px) {
+    section.screen { grid-template-columns: 1fr; gap: 20px; padding-block: 36px; }
+    .text { position: static; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo">V</div><span>Vian Desk · демо</span><a href="../" style="margin-left:auto;font-size:14px;color:var(--vian)">← На главную</a></div>
+    <h1>AI-консультант <em>Vian</em> отвечает клиентам, менеджер подключается, когда нужен человек</h1>
+    <p class="lead">Кабинет для компаний: WhatsApp, Telegram и Instagram в одном окне, CRM, рассылки и сквозная аналитика. Ниже — реальные экраны продукта на примере салона красоты в Алматы.</p>
+    <ol class="flow" aria-label="Путь клиента">
+      <li>Клиент пишет в мессенджер</li>
+      <li>Vian отвечает и квалифицирует</li>
+      <li>Сложный вопрос — менеджеру</li>
+      <li>Сделка в воронке</li>
+      <li>Счёт и оплата из чата</li>
+      <li>Аналитика по рекламе</li>
+    </ol>
+    <div class="cta-row">
+      <a class="btn" href="https://t.me/tauyekel1975" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M21.4 4.2 2.9 11.3c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8L22.9 5.6c.3-1.3-.5-1.9-1.5-1.4ZM8.9 14.1l9.4-5.9c.4-.3.9-.1.5.3l-7.6 6.9-.3 3.3-2-4.6Z"/></svg>Задать вопрос в Telegram</a>
+      <span class="cta-note"><b>2 дня бесплатно</b> — все возможности без ограничений</span>
+    </div>
+    <div class="note">Данные вымышленные: салон «Жасмин», клиенты и суммы созданы для демонстрации</div>
+  </header>
+</div>
+
+<nav class="toc" aria-label="Экраны">
+  <div class="wrap">
+    <a href="#inbox">Инбокс</a><a href="#handover">Передача менеджеру</a><a href="#kazakh">Казахский и голосовые</a>
+    <a href="#dashboard">Рабочий стол</a><a href="#deals">Сделки</a><a href="#analytics">Аналитика</a>
+    <a href="#campaign">Рассылки</a><a href="#quality">Контроль качества</a><a href="#stats">Статистика</a>
+    <a href="#channels">Каналы</a><a href="#vian">Настройки Vian</a><a href="#meta">Правила WhatsApp</a><a href="#start">Попробовать</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section class="screen" id="inbox">
+    <div class="text">
+      <div class="eyebrow">Инбокс</div>
+      <h2>Все мессенджеры в одной ленте</h2>
+      <p>WhatsApp, Telegram и Instagram приходят в один список. Фиолетовый значок на аватаре — диалог ведёт Vian.</p>
+      <ul>
+        <li>Фильтры: непрочитанные, без ответа, мои, у менеджера</li>
+        <li>Теги и метка <span class="chip">Нужен менеджер</span></li>
+        <li>Счётчик непрочитанных в меню</li>
+      </ul>
+    </div>
+    <figure>
+      <a class="frame" href="shots/02-inbox.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/inbox</b></div><img src="shots/02-inbox.jpg" alt="Список диалогов из WhatsApp, Telegram и Instagram" width="1440" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+  <section class="screen" id="handover">
+    <div class="text">
+      <div class="eyebrow">Передача менеджеру</div>
+      <h2>Vian понимает, когда нужен человек</h2>
+      <p>Клиент просит скидку — это решает администратор. Vian сам передаёт диалог и замолкает.</p>
+      <ul>
+        <li>Менеджер видит резюме от Vian: кто клиент, чего хочет, что уже обсудили</li>
+        <li>Жёлтые заметки видят только сотрудники</li>
+        <li>Кнопки «Перехватить» и «Передать Vian»</li>
+        <li>Таймер 24-часового окна WhatsApp</li>
+      </ul>
+    </div>
+    <figure>
+      <a class="frame" href="shots/03-handover.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/inbox · Ерлан</b></div><img src="shots/03-handover.jpg" alt="Диалог, переданный от Vian менеджеру, с резюме и сделкой" width="1440" height="900" loading="lazy"></a>
+      <figcaption>Справа — карточка клиента, сделка с квалификацией от Vian, счета и задачи.</figcaption>
+    </figure>
+  </section>
+
+  <section class="screen" id="kazakh">
+    <div class="text">
+      <div class="eyebrow">Язык и голосовые</div>
+      <h2>Отвечает на языке клиента, понимает голосовые</h2>
+      <p>Клиентка записала голосовое на казахском. Vian получил расшифровку, ответил по-казахски и записал на педикюр.</p>
+      <ul>
+        <li>Русский, казахский, английский</li>
+        <li>Цены и адрес — из базы знаний салона</li>
+      </ul>
+    </div>
+    <figure>
+      <a class="frame" href="shots/04-kazakh-voice.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/inbox · Гүлнар</b></div><img src="shots/04-kazakh-voice.jpg" alt="Голосовое сообщение на казахском и ответ Vian" width="1440" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+  <section class="screen" id="dashboard">
+    <div class="text">
+      <div class="eyebrow">Рабочий стол</div>
+      <h2>Главное за день на одном экране</h2>
+      <p>Сколько диалогов без ответа, сколько ведёт Vian, продажи за месяц и воронка.</p>
+      <ul><li>Доля ответов Vian — сколько работы снято с менеджеров</li></ul>
+    </div>
+    <figure>
+      <a class="frame" href="shots/01-dashboard.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/dashboard</b></div><img src="shots/01-dashboard.jpg" alt="Рабочий стол с показателями и воронкой" width="1440" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+  <section class="screen" id="deals">
+    <div class="text">
+      <div class="eyebrow">CRM</div>
+      <h2>Сделки двигаются сами</h2>
+      <p>Каждый новый клиент — сделка. Vian переводит её по этапам по ходу разговора, менеджер перетаскивает мышкой.</p>
+      <ul>
+        <li>Сумма по каждому этапу</li>
+        <li>Источник: Instagram, 2ГИС, рассылка</li>
+        <li>Синхронизация с amoCRM и Bitrix24</li>
+      </ul>
+    </div>
+    <figure>
+      <a class="frame" href="shots/05-deals.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/deals</b></div><img src="shots/05-deals.jpg" alt="Канбан сделок по этапам воронки" width="1920" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+  <section class="screen" id="analytics">
+    <div class="text">
+      <div class="eyebrow">Сквозная аналитика</div>
+      <h2>Какая реклама приносит деньги</h2>
+      <p>Умная ссылка в сторис открывает WhatsApp с кодом. Сделка сама получает источник, и видно сколько принёс каждый тенге рекламы.</p>
+      <ul>
+        <li>Лиды, продажи, конверсия, CPL, ROMI</li>
+        <li>Клики и продажи по каждой ссылке</li>
+      </ul>
+    </div>
+    <figure>
+      <a class="frame" href="shots/06-analytics.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/analytics</b></div><img src="shots/06-analytics.jpg" alt="Аналитика: выручка и ROMI по источникам, умные ссылки" width="1440" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+  <section class="screen" id="campaign">
+    <div class="text">
+      <div class="eyebrow">Рассылки</div>
+      <h2>Рассылки по шаблонам WhatsApp с отчётом</h2>
+      <p>Аудитория — по тегу, этапу сделки или из файла Excel. Паузы между сообщениями берегут номер от блокировки.</p>
+      <ul>
+        <li>Кто получил, кто ответил, у кого ошибка</li>
+        <li>Клиенты, написавшие «стоп», не получают рассылок</li>
+      </ul>
+    </div>
+    <figure>
+      <a class="frame" href="shots/07-campaign.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/campaigns · Осенний уход −15%</b></div><img src="shots/07-campaign.jpg" alt="Отчёт по рассылке" width="1440" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+  <section class="screen" id="quality">
+    <div class="text">
+      <div class="eyebrow">AI-контроль качества</div>
+      <h2>AI проверяет каждую переписку</h2>
+      <p>Оценка от 1 до 10, конкретные ошибки и что написать иначе. И для менеджеров, и для самого Vian.</p>
+    </div>
+    <figure>
+      <a class="frame" href="shots/08-quality.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/quality</b></div><img src="shots/08-quality.jpg" alt="Оценки диалогов с ошибками и советами" width="1440" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+  <section class="screen" id="stats">
+    <div class="text">
+      <div class="eyebrow">Статистика</div>
+      <h2>Кто и как быстро отвечает</h2>
+      <p>Скорость первого ответа по каждому менеджеру и по Vian, доля ответов в норме 15 минут.</p>
+    </div>
+    <figure>
+      <a class="frame" href="shots/09-stats.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/stats</b></div><img src="shots/09-stats.jpg" alt="Скорость ответа по операторам и каналам" width="1440" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+  <section class="screen" id="channels">
+    <div class="text">
+      <div class="eyebrow">Каналы</div>
+      <h2>Подключение за пару минут</h2>
+      <p>WhatsApp Business API, Telegram-бот, Instagram, Facebook и почта. Ключи проверяются сразу и хранятся зашифрованными.</p>
+    </div>
+    <figure>
+      <a class="frame" href="shots/10-channels.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/channels</b></div><img src="shots/10-channels.jpg" alt="Подключённые каналы и формы подключения" width="1440" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+  <section class="screen" id="vian">
+    <div class="text">
+      <div class="eyebrow">Настройки Vian</div>
+      <h2>Vian знает только то, что вы ему дали</h2>
+      <p>Имя, тон, язык, прайс и правила компании. Vian не выдумывает цены и скидки — такие вопросы передаёт человеку.</p>
+    </div>
+    <figure>
+      <a class="frame" href="shots/11-vian.jpg" target="_blank" rel="noopener"><div class="bar"><i></i><i></i><i></i><b>/vian</b></div><img src="shots/11-vian.jpg" alt="Настройки AI-консультанта: тон, язык, база знаний" width="1440" height="900" loading="lazy"></a>
+    </figure>
+  </section>
+
+
+  <section class="rules" id="meta">
+    <header>
+      <div class="eyebrow">WhatsApp и правила Meta</div>
+      <h2>Официальный канал: номер не блокируют за автоматизацию</h2>
+      <p class="lead" style="font-size:16px">Vian Desk подключается к WhatsApp только через официальный WhatsApp Business Platform (API) от Meta. Это не «серые» подключения через QR-код и WhatsApp Web, за которые номера регулярно блокируют.</p>
+    </header>
+    <div class="rules-grid">
+      <article class="rule">
+        <div class="date">Официальный API</div>
+        <h3>Автоответы и AI разрешены</h3>
+        <p>Meta не блокирует номер за автоматические ответы и работу AI через API. Ограничения грозят только за спам и жалобы клиентов.</p>
+        <p class="verdict"><b>Vian Desk:</b> рассылки только по одобренным Meta шаблонам, паузы между сообщениями, стоп-лист на слово «стоп» — рейтинг номера остаётся высоким.</p>
+      </article>
+      <article class="rule">
+        <div class="date">С 15 января 2026</div>
+        <h3>Запрещены чат-боты общего назначения</h3>
+        <p>Meta убрала из WhatsApp Business API универсальных AI-ассистентов вроде ChatGPT. AI для продаж, записи, заказов и поддержки клиентов компании остаётся разрешённым.</p>
+        <p class="verdict"><b>Vian соответствует:</b> это консультант конкретной компании — отвечает только о её услугах, ценах и записи, сложные вопросы передаёт менеджеру.</p>
+      </article>
+      <article class="rule">
+        <div class="date">С 1 октября 2026</div>
+        <h3>Meta берёт плату за каждое сообщение</h3>
+        <p>Раньше ответы клиенту в течение 24 часов после его сообщения были бесплатными. Теперь Meta берёт плату за каждое сообщение, по тарифам страны.</p>
+        <p class="verdict"><b>Оплата напрямую Meta</b> — без наценки Vian Desk. Vian отвечает коротко и по делу: одна мысль — одно сообщение.</p>
+      </article>
+    </div>
+    <small>Источники: <a href="https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing" target="_blank" rel="noopener">тарифы WhatsApp Business Platform (Meta)</a>, <a href="https://techcrunch.com/2025/10/18/whatssapp-changes-its-terms-to-bar-general-purpose-chatbots-from-its-platform" target="_blank" rel="noopener">изменение правил для AI-чат-ботов (TechCrunch)</a>.</small>
+  </section>
+
+  <section class="final" id="start">
+    <div class="eyebrow">Попробовать</div>
+    <h2>2 дня бесплатно, все возможности</h2>
+    <p>Остались вопросы — как подключить WhatsApp, сколько стоит, подойдёт ли вашему бизнесу? Напишите мне в Telegram, отвечу лично.</p>
+    <a class="btn" href="https://t.me/tauyekel1975" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M21.4 4.2 2.9 11.3c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8L22.9 5.6c.3-1.3-.5-1.9-1.5-1.4ZM8.9 14.1l9.4-5.9c.4-.3.9-.1.5.3l-7.6 6.9-.3 3.3-2-4.6Z"/></svg>Написать в Telegram</a>
+    <span class="handle">@tauyekel1975 · Тауекель</span>
+  </section>
+
+  <footer>
+    <p><strong>Vian Desk</strong> — кабинет для компаний на базе AI-консультанта Vian от VibeFactory. Скриншоты сняты с работающего продукта на демо-данных.</p>
+    <p>Нажмите на любой экран, чтобы открыть его в полном размере.</p>
+  </footer>
+</main>
+
+</body>
+</html>
